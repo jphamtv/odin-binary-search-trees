@@ -14,7 +14,7 @@ function node(data = null, left = null, right = null) {
   return { data, left, right }
 }
 
-function tree(array) {
+function createTree(array) {
   // Sort the array and remove duplicates
   const sortedArray = [...new Set(array.sort((a, b) => a - b))];
   const root = buildTree(sortedArray, 0, sortedArray.length - 1);
@@ -194,25 +194,44 @@ function tree(array) {
     return -1;
   };
 
+  // const isBalanced = (root) => {
+  //   if (root === null) return true;
+
+  //   let leftIsBalanced = isBalanced(root.left);
+  //   let rightIsBalanced = isBalanced(root.right);
+
+  //   let leftHeight = height(root.left);
+  //   let rightHeight = height(root.right);
+
+  //   if (Math.abs(leftHeight - rightHeight) <= 1 && leftIsBalanced && rightIsBalanced) {
+  //     return true;
+  //   } 
+  //   return false;
+  // };
+
   const isBalanced = (root) => {
-    if (root === null) return true;
+    const checkBalance = (node) => {
+      if (node === null) return { height: -1, balanced: true };
 
-    let leftIsBalanced = isBalanced(root.left);
-    let rightIsBalanced = isBalanced(root.right);
+      let left = checkBalance(node.left);
+      if (!left.balanced) return { balanced: false };
 
-    let leftHeight = height(root.left);
-    let rightHeight = height(root.right);
+      let right = checkBalance(node.right);
+      if (!right.balanced) return { balanced: false};
 
-    if (Math.abs(leftHeight - rightHeight) <= 1 && leftIsBalanced && rightIsBalanced) {
-      return true;
-    } 
-    return false;
+      let heightDifference = Math.abs(left.height - right.height);
+      let isBalanced = heightDifference <= 1;
+
+      return { height: Math.max(left.height, right.height) + 1, balanced: isBalanced }
+    };
+
+    return checkBalance(root).balanced;
   };
 
   const rebalance = (root) => {
     let sortedArray = inOrder(root);
-    let rootNode = tree(sortedArray);
-    
+    let rootNode = createTree(sortedArray);
+
     return rootNode;
   }
 
@@ -252,7 +271,7 @@ function doubleValue(node) {
 }
 
 const array = [3, 6, 8, 23, 48, 76, 89, 13, 66, 56]
-let myTree = tree(array);
+let myTree = createTree(array);
 let root = myTree.root;
 prettyPrint(myTree.root);
 console.log(myTree.isBalanced(root))
