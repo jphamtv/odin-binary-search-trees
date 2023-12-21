@@ -176,23 +176,45 @@ function tree(array) {
     return 1 + Math.max(leftHeight, rightHeight);
   };
 
-  const depth = (root, currentNode) => {
+  const depth = (currentNode, root) => {
     if (root === null || currentNode === null) return -1;
     if (root === currentNode) return 0;
 
     if (currentNode.data < root.data) {
       // Node might be in left subtree
-      let leftDepth = depth(root.left, currentNode);    
+      let leftDepth = depth(currentNode, root.left);    
       if (leftDepth !== -1) return 1 + leftDepth;
     } else {
       // Node might be in right subtree
-      let rightDepth = depth(root.right, currentNode);
+      let rightDepth = depth(currentNode, root.right);
       if (rightDepth !== -1) return 1 + rightDepth;
     }
 
     // Node not found in either subtree
     return -1;
   };
+
+  const isBalanced = (root) => {
+    if (root === null) return true;
+
+    let leftIsBalanced = isBalanced(root.left);
+    let rightIsBalanced = isBalanced(root.right);
+
+    let leftHeight = height(root.left);
+    let rightHeight = height(root.right);
+
+    if (Math.abs(leftHeight - rightHeight) <= 1 && leftIsBalanced && rightIsBalanced) {
+      return true;
+    } 
+    return false;
+  };
+
+  const rebalance = (root) => {
+    let sortedArray = inOrder(root);
+    let rootNode = tree(sortedArray);
+    
+    return rootNode;
+  }
 
   return { 
     root, 
@@ -205,6 +227,8 @@ function tree(array) {
     postOrder,
     height,
     depth,
+    isBalanced,
+    rebalance,
   };
 }
 
@@ -227,14 +251,23 @@ function doubleValue(node) {
   console.log(sum);
 }
 
-
-const array = [3, 6, 8, 23, 48, 76, 89]
+const array = [3, 6, 8, 23, 48, 76, 89, 13, 66, 56]
 let myTree = tree(array);
+let root = myTree.root;
+prettyPrint(myTree.root);
+console.log(myTree.isBalanced(root))
 
+// Add random numbers > 100
 myTree.insert(159);
-myTree.insert(13);
-myTree.insert(66);
-myTree.insert(56);
+myTree.insert(533);
+myTree.insert(654);
+myTree.insert(101);
+
+prettyPrint(myTree.root);
+console.log(myTree.isBalanced(root))
 
 
-
+let rebalancedTree = myTree.rebalance(root);
+let rebalancedTreeRoot = rebalancedTree.root;
+prettyPrint(rebalancedTreeRoot);
+console.log(rebalancedTree.isBalanced(rebalancedTreeRoot));
