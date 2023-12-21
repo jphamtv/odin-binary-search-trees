@@ -51,7 +51,6 @@ function tree(array) {
       
       // Node with two children, get the inorder successor
       currentNode.data = minValue(currentNode.right);
-      console.log(currentNode.data);
       
       // Delete the inorder successor
       currentNode.right = deleteNode(currentNode.data, currentNode.right);
@@ -116,7 +115,6 @@ function tree(array) {
   const preOrder = (currentNode = root, callback = null) => {
     if (currentNode === null) return [];
 
-    // let currentNode = root;
     let result = [];
 
     if (callback) {
@@ -132,18 +130,69 @@ function tree(array) {
   };
 
   // Depth-first traversal: left subtree -> root -> right subtree
-  const inOrder = (callback = null) => {
-    let currentNode = root;
+  // The result will be in sorted order
+  const inOrder = (currentNode = root, callback = null) => {
+    if (currentNode === null) return [];
+
     let result = [];
+    
+    result = result.concat(inOrder(currentNode.left, callback));
+    
+    if (callback) {
+      callback(currentNode);
+    } else {
+      result.push(currentNode.data);
+    }
+    
+    result = result.concat(inOrder(currentNode.right, callback));
 
+    return result;
   };
-
 
   // Depth-first traversal: left subtree -> right subtree -> root
-  const postOrder = (callback = null) => {
-  
+  const postOrder = (currentNode = root, callback = null) => {
+    if (currentNode === null) return [];
+
+    let result = [];
+    
+    result = result.concat(postOrder(currentNode.left, callback));
+    result = result.concat(postOrder(currentNode.right, callback));
+    
+    if (callback) {
+      callback(currentNode);
+    } else {
+      result.push(currentNode.data);
+    }
+    
+    return result;
   };
 
+  const height = (currentNode) => {
+    if (currentNode === null) return -1;
+
+    let leftHeight = height(currentNode.left);
+    let rightHeight = height(currentNode.right);
+    
+    return 1 + Math.max(leftHeight, rightHeight);
+  };
+
+  const depth = (root, currentNode) => {
+    if (root === null || currentNode === null) return -1;
+    if (root === currentNode) return 0;
+
+    if (currentNode.data < root.data) {
+      // Node might be in left subtree
+      let leftDepth = depth(root.left, currentNode);    
+      if (leftDepth !== -1) return 1 + leftDepth;
+    } else {
+      // Node might be in right subtree
+      let rightDepth = depth(root.right, currentNode);
+      if (rightDepth !== -1) return 1 + rightDepth;
+    }
+
+    // Node not found in either subtree
+    return -1;
+  };
 
   return { 
     root, 
@@ -154,6 +203,8 @@ function tree(array) {
     inOrder,
     preOrder,
     postOrder,
+    height,
+    depth,
   };
 }
 
@@ -185,15 +236,5 @@ myTree.insert(13);
 myTree.insert(66);
 myTree.insert(56);
 
-let find = myTree.find(76);
-console.log(`Found node: ${find.data}`)
 
-let deletedNode = myTree.deleteNode(76)
 
-let levelOrderTraverse = myTree.levelOrder();
-console.log(levelOrderTraverse);
-
-let preOrderTraverse = myTree.preOrder();
-console.log(preOrderTraverse);
-
-let printTree = prettyPrint(myTree.root);
